@@ -1,0 +1,402 @@
+---
+title: "Homework3: Gapminder dataset manipulation and exploration using dplyr/ggplot2"
+author: "Jummy David"
+date: "October 2, 2018"
+output:
+  github_document:
+    toc: yes
+
+---
+
+In this homework, we will manipulate the gapminder dataset and explore different variables. To start with, load the `tidyverse` and `gapminder` R packages in a suppressed format. 
+
+
+```{r}
+suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(gapminder))
+
+```
+
+
+Install `knitr` and `kable` packages to have a more readable, fancy and better table.
+
+#```{r}
+#library(knitr)
+#library(kableExtra)
+
+#```
+
+##TASK1: Get the maximum and minimum of GDP per capita for all continents:
+
+Create a copy of the gapminder data and call it `Gap` so as to be sure the original gapminder dataset is kept intact.
+
+```{r}
+Gap <- gapminder
+
+```
+
+Group by continent and summarise the minimum and the maximum GDP per capita using a table.
+
+```{r}
+A1 <- Gap %>%
+  group_by(continent) %>%
+  summarize(min_GDP = min(gdpPercap), max_GDP = max(gdpPercap))
+
+knitr::kable(A1) #the chunk code here makes table A1 look nicer and better.
+```
+
+Here we install and load the library `gridExtra` where I will be calling the function `grid.arrange`.
+
+```{r}
+library(gridExtra)
+```
+
+Here we have a barplot of the maximum and minimum GDP per capita which represents our observations from the table. The command `geom_col` gives a barplot by continents. And the upper plot (minimum GDP per capita) shows that Oceania has the highest minimum GDP while Africa has the lowest GDP. Also, the lower plot (maximum GDP per capita) shows that Asia has the highest maximum GDP and Africa still has the lowest maximum GDP. Here, I tried to use `stat=identity` and `position=dodge` but it was giving error, so I decided to use `grid.arrange`.
+
+```{r}
+Min_plot <- A1 %>%
+  ggplot(aes(continent, min_GDP, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Minimum GDP per capita") +
+  ggtitle(" Minimum GDP per capita by continents")+theme(plot.title = element_text(hjust = 0.5))
+
+
+Max_plot <- A1 %>%
+  ggplot(aes(continent, max_GDP, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Maximum GDP per capita") + #used to label the x and y axis and as well the title of the plot.
+  ggtitle("Maximum GDP per capita by continents")+theme(plot.title = element_text(hjust = 0.5))
+
+  
+
+grid.arrange(Min_plot, Max_plot) #The code here is to put both plots on a page for better comparison.
+```
+
+
+Here I made a table of the minimum and maximum GDPpercap and group by continent and year.
+```{r}
+A11 <- Gap %>%
+  group_by(continent,year) %>%
+  summarize(min_GDP = min(gdpPercap), max_GDP = max(gdpPercap)) 
+  
+  
+  A11 %>% head(10) %>% knitr::kable() #The code here is to view the first 10 rows.
+
+
+```
+
+
+Plots of minimum GDP per capita for different continent through all years. I initially used `grid.arrange` but it was hard to distinguish the lines for different continents in both plots. So I decided to have them separate.  We see here that through out the years, Oceania seems to have the highest minimum GDP per capita which increases almost every year, followed by Europe. African seems to have the lowest minimum with no significant increase.
+
+
+```{r}
+A11 %>%
+  ggplot(aes(year, min_GDP, shape = continent, colour = continent)) +
+  geom_point() +
+  geom_line() +
+  scale_y_log10() +
+  labs(x="Years", y = "Minimum GDP per capita") +
+  ggtitle("Minimum gdpPercap for different continents through all the years")+theme(plot.title = element_text(hjust = 0.5))
+
+``` 
+
+
+
+Plots of maximum GDP per capita for different continent through all years. We see here that Asia has the highest maximum GDP per capita at the early years and then decreases below that of Eorope. Oceania's GDP seems  stable througout the years, while Africa increases at the early years and then decreses to the least maximum.
+
+```{r}  
+A11 %>%
+  ggplot(aes(year, max_GDP, shape = continent, colour = continent)) +
+  geom_point() +
+  geom_line() +
+  scale_y_log10() + #used for rescaling
+  labs(x="Years", y = "Maximum GDP per capita") +
+  ggtitle("Maximum gdpPercap for different continents through all the years")+theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+
+## TASK2: Look at the spread of GDP per capita within the continents
+
+The table here shows the spread of GDP per capita within each continents. The command `summarize` is used to solve for different statistical measure of spread. 
+```{r}
+C1 <- Gap %>%
+  group_by(continent) %>%
+  summarize(min_GDP = min(gdpPercap), mean_GDP = mean(gdpPercap), Var_GDP = var(gdpPercap), SD_GDP = sd(gdpPercap), IQR = IQR(gdpPercap), First_Q = quantile(gdpPercap, 0.25), Third_Q = quantile(gdpPercap, 0.75), max_GDP = max(gdpPercap))
+
+knitr::kable(C1) #%>% #the code here is used to make a fancy table
+  #kable_styling(bootstrap_options = "striped", full_width = F) ##the code here is used to change the stle of the table and reduce from full size.
+
+```
+
+
+Here we have the distribution of the spread of GDP per capita. We need to install the `gridExtra` package here before we can use `grid.arrange`. I made a barplot of each of the measures and used `grid.arrange` command to put them on a plot. We can see here that the `Mean`, `First quantile` and `second quantile` are highest in Oceania followed by Europe. While has the highest `standard deviation` and `variance`.
+
+
+```{r}
+One <- C1 %>%
+  ggplot(aes(continent, mean_GDP, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Mean")
+Two <- C1 %>%
+  ggplot(aes(continent, Var_GDP, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Variance")
+Three <- C1  %>%
+  ggplot(aes(continent, SD_GDP, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Standard deviation")
+
+Four <- C1 %>%
+  ggplot(aes(continent, IQR, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Interquartile range")
+
+Five <- C1 %>%
+  ggplot(aes(continent, First_Q, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "First quantile")
+
+Six <-C1 %>%
+  ggplot(aes(continent, Third_Q, fill = continent)) +
+  geom_col() +
+  labs(x="Continent", y = "Third quantile")
+
+grid.arrange(One, Two, Three, Four, Five, Six, nrow = 3) #the chunk code here is to put all of my plots on a single page.
+```
+
+
+Here we have the spread of GDP per capita for different continents. We have represented the spread here with `geom_point` which I showed in different colour the different measure of spread. I used `geom_point` to add all of the plot together, `log scale`, colour each measure differently and then label. Here we see that Africa which happens to be my continent has the lowest minimum GDP and variance. Asia has the highest variance.
+
+
+```{r}
+C1 %>%
+  ggplot() +
+  geom_point(aes(continent, min_GDP, colour = "Minimum GDP")) +
+  geom_point(aes(continent, mean_GDP, colour = "Mean GDP")) +
+  geom_point(aes(continent, Var_GDP, colour = "GDP variance")) +
+  geom_point(aes(continent, SD_GDP, colour = "GDP standard deviation")) +
+  geom_point(aes(continent, IQR, colour = "GDP Interquartile range")) +
+  geom_point(aes(continent, First_Q, colour = "GDP first quantile")) +
+  geom_point(aes(continent, Third_Q, colour = "GDP third quantile")) +
+  geom_point(aes(continent, max_GDP, colour = "Maximum GDP")) +
+  scale_y_log10() +
+  labs(x="Continent", y="Spread of GDP per capita") +
+  ggtitle("The Spread of GDP per capita for different continents")+theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+Here we see the distribution of GDP per capita for different continents. We `grouped` by continent, make a histogram using the command `geom_histogram` and then split into different continent using the command `facet wrap`. The command `facet_wrap` is used to make separate histograms for each continent. The command `scales  = free` is used to make each continent have their own distinct x and y axis. We can see here that Africa has the highest count of gdpPercap. We can clearly see that Africa has the highest distribution of GDP per capita followed by Asia, with Oceania being the lowest. 
+
+
+```{r}
+gapminder %>%
+  group_by(continent) %>%
+  ggplot(aes(x=gdpPercap, fill = continent)) +
+  geom_histogram(colour = 'black')+
+  facet_wrap(~continent, scales = "free") +
+  labs(x="GDP per capita", y = "Count") +
+  ggtitle("Distrubution of GDP per capita for different continents")+theme(plot.title = element_text(hjust = 0.5))
+  
+
+```
+ 
+
+Here, I show the boxplot of gdpPercap among all continent using pink colour. I also use the `ggtitle` to specify the title of the plot. This shows that Oceania has the highest gdpPercap, while Africa has the lowest. We also rescaled by using the command `scale_y_log10` to see a clearer difference between the boxplots.
+
+
+```{r}
+ggplot(aes(x = continent, y = gdpPercap), data =gapminder) +
+  scale_y_log10() +
+geom_boxplot(fill = "pink") +
+  labs(x="Continent", y = "GDP per capita") +
+ggtitle("GDP per capita in all continent")+theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+
+
+
+
+
+Similarly, this is a violin plot using the command `geom_violin` as well as rescaling to show the distribution of gdpPercap in each continent. We also see here that Oceania have higher gdpPercap and Africa have the lowest.
+
+```{r}
+ggplot(gapminder, aes(continent, gdpPercap)) +
+  scale_y_log10() +
+  geom_violin(fill = "pink") +
+  labs(x="Continent", y = "GDP per capita") +
+  ggtitle("Distrubution of GDP per capita for all continents using violin plot")+theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+
+This is a violin plot with jitter plot using the command `geom_jitter`. It also shows the distribution of gdpPercap in each continent. I rescaled here as well.
+
+```{r}
+ggplot(gapminder, aes(continent, gdpPercap)) +
+  scale_y_log10() +
+  geom_jitter(alpha=0.3) +
+  labs(x="Continent", y = "GDP per capita") +
+  ggtitle("Distrubution of GDP per capita for all continents using jitter plot")+theme(plot.title = element_text(hjust = 0.5))
+
+
+```
+  
+
+##TASK3: Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean:
+
+The table here has three colums of the normal mean life expectancy (Vanilla mean) and the weighted mean. We grouped by year and summarized. I noticed here that when I mistakingly typed `summarise` it worked perfectly as `summarize` would. From the table below, we see the total mean and weighted mean life expectancy for all years.
+
+```{r}
+D1 <- Gap %>%
+  group_by(year) %>%
+  summarize(Mean_lifeExp = mean(lifeExp), Weighted_mean_lifeExp = weighted.mean(lifeExp, pop)) 
+
+D1 %>% knitr::kable() #to have a better and a more readable table
+```
+
+
+The figure here represents our table above. I used the command `geom_line` and `geom_point` to add the lines on a plot. We see here that both means started at the same point, then the weighted mean increased above vanilla mean. Something interesting seems to happen shortly before after year 1960.
+
+
+```{r}
+D1 %>%
+  ggplot() +
+  geom_point(aes(year, Mean_lifeExp, colour = "Vanilla mean")) +
+  geom_line(aes(year, Mean_lifeExp, colour = "Vanilla mean")) +
+  geom_point(aes(year, Weighted_mean_lifeExp, colour = "Weighted mean")) +
+  geom_line(aes(year, Weighted_mean_lifeExp, colour = "Weighted mean")) +
+  labs(x="Year", y="Mean life expectancy") +
+  ggtitle("Mean life expectancy for different years")+theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+##TASK4: How is life expectancy changing over time on different continents?:
+Here I grouped the table by continent and year, then summarize the mean life expectancy using the command `summarize`. I also used the `head` command to view just the first 6 rows, then used the `knitr::kable` command to make the table look good.
+
+```{r}
+Change_Gap <- Gap %>%
+  group_by(continent, year) %>%
+  summarize(mean_lifeExp = mean(lifeExp))
+
+Change <- Change_Gap %>% head() %>%
+  knitr::kable()
+Change
+```
+
+
+Here, we have a line plot that shows the change in life expectancy for different continents in all the years. We see that Oceania has the highest mean life expectancy, followed by Europe and with Africa being the lowest for all years.
+
+```{r}
+Change_Gap %>% 
+  ggplot(aes(year, mean_lifeExp, colour = continent)) + #the chunk code here is used to plot the mean life expectancy versus year, coloured by different continent.
+  geom_point() + #all the data point for different years
+  geom_line() + #Put lines across the points.
+  labs(x="Year", y="Mean life expectancy") +
+  ggtitle("Change in life expectancy among all continents in all years")+theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+We have the same plot as above, but here I showed how the command `facet_wrap` can be used to separate by continents. And we have the mean life expectancy of different continents across all years.
+
+```{r}
+ Change_Gap %>% 
+  ggplot(aes(year, mean_lifeExp, colour = continent)) + 
+  geom_point() +
+  geom_line() +
+  facet_wrap(~continent, scales = "free") +
+  labs(x="Year", y="Mean life expectancy") +
+  ggtitle("Change in life expectancy among all continents in all years")+theme(plot.title = element_text(hjust = 0.5))
+```  
+
+
+The plot of the life expectancy of all continents in all years. We plot life expectancy here to show its spread among all continents and also use the command `facet_wrap` as used in the previous plots.
+
+```{r}    
+Gap %>% 
+  ggplot(aes(year, lifeExp, colour = continent)) + 
+  geom_point() +
+  geom_line() +
+  facet_wrap(~continent, scales = "free")+
+  labs(x="Year", y="Life expectancy") +
+  ggtitle("Life expectancy among all continents in all years")+theme(plot.title = element_text(hjust = 0.5))
+```  
+
+Here we have density plots to also show the spread of life expectancy versus continent stratified by year. We have the density of the life expectancy of all continents on a plots and make these plots for different years. We controlled our colour a bit here to make the density plot of diferent continents visible. We can see that throughout the years, Oceania seems to have the highest density, followed by Europe. 
+
+
+```{r}    
+Gap %>% 
+ggplot(aes(x = lifeExp, fill = continent)) +
+  facet_wrap(~year) + geom_density(alpha = 0.3) + ggtitle("Density plots of life expectancy for each continents and in all years") + theme(legend.title = element_text(color = "black", size = 14, face = "bold"), legend.background = element_rect(fill = "gray80",size = 0.2, linetype = "dashed")) + labs(x="Life expectancy", y="Density")+scale_fill_manual( values = c("orange","blue","maroon","darkgreen","midnightblue"))
+```
+
+##TASK5: Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.
+
+The table here is used to show different measure of the world life expectancy. The command `knitr::kable` is used as above while the command `kable_styling` is used for styling and spacing the table. The table is shrink to readable size when `full_width =F` is specified.
+
+```{r}
+World_lex <- Gap %>%
+  group_by(year) %>%
+  summarize(min_lifeExp = min(lifeExp), mean_lifeExp = mean(lifeExp), Var_lifeExp = var(lifeExp), SD_lifeExp = sd(lifeExp), IQR = IQR(lifeExp), First_Q_lifeExp = quantile(lifeExp, 0.25), Third_Q_lifeExp = quantile(lifeExp, 0.75), max_GDP = max(lifeExp))
+
+knitr::kable(World_lex) #%>%
+  #kable_styling(bootstrap_options = "striped", full_width = F)
+
+```
+
+
+The table here gives the percentage of countries with low life expectancy in each continent over time. We see that in 1952, $96 \%$ of countries in African experienced low life expectancy. We also note that Oceania have no low life expectancy through all years.
+
+```{r}
+(rbench = round(mean(World_lex$First_Q_lifeExp))) #Here I made the first quantile life expectancy my benchmark 
+
+Low_lifeExp <-Gap %>%
+  group_by(continent, year) %>%
+  summarize(Low_Exp_percent = round(sum(lifeExp < rbench)/length(lifeExp),2)) %>% #The chunk code here filter those with life expectancy lower than the benchmark and generate the result in percentage. 
+  arrange(year) #I arranged by year.
+
+knitr::kable(Low_lifeExp) 
+ 
+```
+
+The line plot here shows a similar information as the table above. Oceania's low life expectancy is zero for all years. Africa have the highest low life expectancy, then decreases over the years to around $40 \%$. Americas life expectancy was also low initial but decreases to zero over the years.
+
+```{r}
+Low_lifeExp %>% 
+  ggplot(aes(year, Low_Exp_percent, colour = continent)) + 
+  geom_point() +
+  geom_line() +
+  labs(x="Year", y="Low life expectancy") +
+  ggtitle("Percentage of continents with low life expectancy over time")+theme(plot.title = element_text(hjust = 0.5))
+```
+
+Here I used the command `facet_wrap` to view different continents separately so as to see obvious difference between the continents.
+
+```{r}
+Low_lifeExp %>% 
+  ggplot(aes(year, Low_Exp_percent, colour = continent)) + 
+  geom_point() +
+  geom_line() +
+  facet_wrap(~continent) +
+  labs(x="Year", y="Low life expectancy") +
+     ggtitle("Percentage of continents with low life expectancy over time")+theme(plot.title = element_text(hjust = 0.5))
+
+```
+
+## But I want to do more: Combine table and figures from task 1.
+
+Here I am combining table and figure. I first use the command `tableGrob` to transform the table into a Grob.
+
+```{r}
+A1_Grob <- tableGrob(A1, theme=ttheme_minimal(), rows=NULL)
+grid.arrange(A1_Grob, Min_plot, Max_plot, nrow=2)
+
+```
+
+
+## References:
+
+[Rbloggers]("https://www.r-bloggers.com/data-visualization-in-r-using-ggplot2/")
