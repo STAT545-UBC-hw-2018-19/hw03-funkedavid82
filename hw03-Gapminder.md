@@ -3,17 +3,13 @@ Homework3: Gapminder dataset manipulation and exploration using dplyr/ggplot2
 Jummy David
 October 2, 2018
 
--   [\`\`\`{r}](#r)
--   [library(knitr)](#libraryknitr)
--   [library(kableExtra)](#librarykableextra)
--   [\`\`\`](#section)
-    -   [TASK1: Get the maximum and minimum of GDP per capita for all continents:](#task1-get-the-maximum-and-minimum-of-gdp-per-capita-for-all-continents)
-    -   [TASK2: Look at the spread of GDP per capita within the continents](#task2-look-at-the-spread-of-gdp-per-capita-within-the-continents)
-    -   [TASK3: Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean:](#task3-compute-a-trimmed-mean-of-life-expectancy-for-different-years.-or-a-weighted-mean-weighting-by-population.-just-try-something-other-than-the-plain-vanilla-mean)
-    -   [TASK4: How is life expectancy changing over time on different continents?:](#task4-how-is-life-expectancy-changing-over-time-on-different-continents)
-    -   [TASK5: Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.](#task5-report-the-absolute-andor-relative-abundance-of-countries-with-low-life-expectancy-over-time-by-continent-compute-some-measure-of-worldwide-life-expectancy-you-decide-a-mean-or-median-or-some-other-quantile-or-perhaps-your-current-age.-then-determine-how-many-countries-on-each-continent-have-a-life-expectancy-less-than-this-benchmark-for-each-year.)
-    -   [But I want to do more: Combine table and figures from task 1.](#but-i-want-to-do-more-combine-table-and-figures-from-task-1.)
-    -   [References:](#references)
+-   [TASK1: Get the maximum and minimum of GDP per capita for all continents:](#task1-get-the-maximum-and-minimum-of-gdp-per-capita-for-all-continents)
+-   [TASK2: Look at the spread of GDP per capita within the continents](#task2-look-at-the-spread-of-gdp-per-capita-within-the-continents)
+-   [TASK3: Compute a trimmed mean of life expectancy for different years. Or a weighted mean, weighting by population. Just try something other than the plain vanilla mean:](#task3-compute-a-trimmed-mean-of-life-expectancy-for-different-years.-or-a-weighted-mean-weighting-by-population.-just-try-something-other-than-the-plain-vanilla-mean)
+-   [TASK4: How is life expectancy changing over time on different continents?:](#task4-how-is-life-expectancy-changing-over-time-on-different-continents)
+-   [TASK5: Report the absolute and/or relative abundance of countries with low life expectancy over time by continent: Compute some measure of worldwide life expectancy – you decide – a mean or median or some other quantile or perhaps your current age. Then determine how many countries on each continent have a life expectancy less than this benchmark, for each year.](#task5-report-the-absolute-andor-relative-abundance-of-countries-with-low-life-expectancy-over-time-by-continent-compute-some-measure-of-worldwide-life-expectancy-you-decide-a-mean-or-median-or-some-other-quantile-or-perhaps-your-current-age.-then-determine-how-many-countries-on-each-continent-have-a-life-expectancy-less-than-this-benchmark-for-each-year.)
+-   [But I want to do more: Combine table and figures from task 1.](#but-i-want-to-do-more-combine-table-and-figures-from-task-1.)
+-   [References:](#references)
 
 In this homework, we will manipulate the gapminder dataset and explore different variables. To start with, load the `tidyverse` and `gapminder` R packages in a suppressed format.
 
@@ -34,20 +30,6 @@ suppressPackageStartupMessages(library(gapminder))
 ```
 
     ## Warning: package 'gapminder' was built under R version 3.3.2
-
-Install `knitr` and `kable` packages to have a more readable, fancy and better table.
-
-\`\`\`{r}
-=========
-
-library(knitr)
-==============
-
-library(kableExtra)
-===================
-
-\`\`\`
-======
 
 TASK1: Get the maximum and minimum of GDP per capita for all continents:
 ------------------------------------------------------------------------
@@ -180,7 +162,7 @@ C1 <- Gap %>%
     ## Warning: package 'bindrcpp' was built under R version 3.3.2
 
 ``` r
-knitr::kable(C1) #%>% #the code here is used to make a fancy table
+knitr::kable(C1) #the code here is used to make a fancy table
 ```
 
 | continent |    min\_GDP|  mean\_GDP|   Var\_GDP|    SD\_GDP|        IQR|   First\_Q|   Third\_Q|   max\_GDP|
@@ -190,10 +172,6 @@ knitr::kable(C1) #%>% #the code here is used to make a fancy table
 | Asia      |    331.0000|   7902.150|  197272506|  14045.373|   7492.262|   1056.993|   8549.256|  113523.13|
 | Europe    |    973.5332|  14469.476|   87520020|   9355.213|  13248.301|   7213.085|  20461.386|   49357.19|
 | Oceania   |  10039.5956|  18621.609|   40436669|   6358.983|   8072.258|  14141.859|  22214.117|   34435.37|
-
-``` r
-  #kable_styling(bootstrap_options = "striped", full_width = F) ##the code here is used to change the stle of the table and reduce from full size.
-```
 
 Here we have the distribution of the spread of GDP per capita. We need to install the `gridExtra` package here before we can use `grid.arrange`. I made a barplot of each of the measures and used `grid.arrange` command to put them on a plot. We can see here that the `Mean`, `First quantile` and `second quantile` are highest in Oceania followed by Europe. While has the highest `standard deviation` and `variance`.
 
@@ -431,7 +409,7 @@ World_lex <- Gap %>%
   group_by(year) %>%
   summarize(min_lifeExp = min(lifeExp), mean_lifeExp = mean(lifeExp), Var_lifeExp = var(lifeExp), SD_lifeExp = sd(lifeExp), IQR = IQR(lifeExp), First_Q_lifeExp = quantile(lifeExp, 0.25), Third_Q_lifeExp = quantile(lifeExp, 0.75), max_GDP = max(lifeExp))
 
-knitr::kable(World_lex) #%>%
+knitr::kable(World_lex) 
 ```
 
 |  year|  min\_lifeExp|  mean\_lifeExp|  Var\_lifeExp|  SD\_lifeExp|       IQR|  First\_Q\_lifeExp|  Third\_Q\_lifeExp|  max\_GDP|
@@ -448,10 +426,6 @@ knitr::kable(World_lex) #%>%
 |  1997|        36.087|       65.01468|      133.6206|     11.55944|  18.53600|           55.63375|           74.16975|    80.690|
 |  2002|        39.193|       65.69492|      150.7940|     12.27982|  19.93700|           55.52225|           75.45925|    82.000|
 |  2007|        39.613|       67.00742|      145.7578|     12.07302|  19.25300|           57.16025|           76.41325|    82.603|
-
-``` r
-  #kable_styling(bootstrap_options = "striped", full_width = F)
-```
 
 The table here gives the percentage of countries with low life expectancy in each continent over time. We see that in 1952, 96% of countries in African experienced low life expectancy. We also note that Oceania have no low life expectancy through all years.
 
@@ -575,4 +549,4 @@ grid.arrange(A1_Grob, Min_plot, Max_plot, nrow=2)
 References:
 -----------
 
-[Rbloggers](%22https://www.r-bloggers.com/data-visualization-in-r-using-ggplot2/%22)
+[Rbloggers](https://www.r-bloggers.com/data-visualization-in-r-using-ggplot2/)

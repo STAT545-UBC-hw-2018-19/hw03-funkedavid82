@@ -18,14 +18,6 @@ suppressPackageStartupMessages(library(gapminder))
 ```
 
 
-Install `knitr` and `kable` packages to have a more readable, fancy and better table.
-
-#```{r}
-#library(knitr)
-#library(kableExtra)
-
-#```
-
 ##TASK1: Get the maximum and minimum of GDP per capita for all continents:
 
 Create a copy of the gapminder data and call it `Gap` so as to be sure the original gapminder dataset is kept intact.
@@ -124,9 +116,7 @@ C1 <- Gap %>%
   group_by(continent) %>%
   summarize(min_GDP = min(gdpPercap), mean_GDP = mean(gdpPercap), Var_GDP = var(gdpPercap), SD_GDP = sd(gdpPercap), IQR = IQR(gdpPercap), First_Q = quantile(gdpPercap, 0.25), Third_Q = quantile(gdpPercap, 0.75), max_GDP = max(gdpPercap))
 
-knitr::kable(C1) #%>% #the code here is used to make a fancy table
-  #kable_styling(bootstrap_options = "striped", full_width = F) ##the code here is used to change the stle of the table and reduce from full size.
-
+knitr::kable(C1) #the code here is used to make a fancy table
 ```
 
 
@@ -342,9 +332,7 @@ World_lex <- Gap %>%
   group_by(year) %>%
   summarize(min_lifeExp = min(lifeExp), mean_lifeExp = mean(lifeExp), Var_lifeExp = var(lifeExp), SD_lifeExp = sd(lifeExp), IQR = IQR(lifeExp), First_Q_lifeExp = quantile(lifeExp, 0.25), Third_Q_lifeExp = quantile(lifeExp, 0.75), max_GDP = max(lifeExp))
 
-knitr::kable(World_lex) #%>%
-  #kable_styling(bootstrap_options = "striped", full_width = F)
-
+knitr::kable(World_lex) 
 ```
 
 
@@ -399,4 +387,4 @@ grid.arrange(A1_Grob, Min_plot, Max_plot, nrow=2)
 
 ## References:
 
-[Rbloggers]("https://www.r-bloggers.com/data-visualization-in-r-using-ggplot2/")
+[Rbloggers](https://www.r-bloggers.com/data-visualization-in-r-using-ggplot2/)
